@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "467635726460",
+    "project_id": "burtbees-41dbf",
+    "storage_bucket": "burtbees-41dbf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467635726460:android:fba46e98360865c5eac1f9",
+        "android_client_info": {
+          "package_name": "com.example.burtbees"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467635726460-hcerb2a2nrnr93ci36lbv42sr60kbq79.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCH13tgI3gm8mYwRDxn9m4eq4fO8t_URuw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467635726460-hcerb2a2nrnr93ci36lbv42sr60kbq79.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
