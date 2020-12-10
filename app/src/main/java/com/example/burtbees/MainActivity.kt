@@ -1,12 +1,15 @@
 package com.example.burtbees
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import com.example.burtbees.navigation.AlarmFragment
-import com.example.burtbees.navigation.DetailViewFragment
-import com.example.burtbees.navigation.GridFragment
-import com.example.burtbees.navigation.UserFragment
+import android.view.View
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import com.example.burtbees.navigation.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity(),BottomNavigationView.OnNavigationItemSelectedListener {
@@ -16,7 +19,12 @@ class MainActivity : AppCompatActivity(),BottomNavigationView.OnNavigationItemSe
         setContentView(R.layout.activity_main)
         bottom_navigation=findViewById(R.id.bottom_navigation)
         bottom_navigation.setOnNavigationItemSelectedListener(this)
+        bottom_navigation.selectedItemId=R.id.action_home
+
+        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),1)
     }
+
+
 
     override fun onNavigationItemSelected(p0: MenuItem): Boolean {
         when(p0.itemId){
@@ -31,7 +39,9 @@ class MainActivity : AppCompatActivity(),BottomNavigationView.OnNavigationItemSe
                 return true
             }
             R.id.action_add_photo->{
-
+                if(ContextCompat.checkSelfPermission(this,Manifest.permission.READ_EXTERNAL_STORAGE)==PackageManager.PERMISSION_GRANTED){
+                    startActivity(Intent(this,AddPhotoActivity::class.java))
+                }
                 return true
             }
             R.id.action_favorite_alarm->{
