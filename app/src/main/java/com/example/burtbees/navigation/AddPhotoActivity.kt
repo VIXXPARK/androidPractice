@@ -6,10 +6,16 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import com.example.burtbees.R
+import com.example.burtbees.navigation.model.ContentDTO
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.UploadTask
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -17,16 +23,24 @@ class AddPhotoActivity : AppCompatActivity() {
     var PICK_IMAGE_FROM_ALBUM = 0
     var storage : FirebaseStorage? =null
     var photoUri : Uri? = null
+    var auth : FirebaseAuth? = null
+    var firestore : FirebaseFirestore? = null
+
     private lateinit var addphoto_btn_upload : Button
     private lateinit var addphoto_image:ImageView
+    private lateinit var addphoto_edit_explain:EditText
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_photo)
 
         addphoto_btn_upload=findViewById(R.id.addphoto_btn_upload)
         addphoto_image=findViewById(R.id.addphoto_image)
+        addphoto_edit_explain=findViewById(R.id.addphoto_edit_explain)
         //Initiate storage
         storage = FirebaseStorage.getInstance()
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
         //Open the album
         var photoPickerIntent = Intent(Intent.ACTION_PICK)
@@ -61,9 +75,62 @@ class AddPhotoActivity : AppCompatActivity() {
 
         var storageRef = storage?.reference?.child("images")?.child(imageFileName)
 
-        //FileUpload
-        storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
-            Toast.makeText(this,getString(R.string.upload_success),Toast.LENGTH_LONG).show()
+
+        //Promise method
+        storageRef?.putFile(photoUri!!)?.continueWithTask{task: Task<UploadTask.TaskSnapshot> ->
+            return@continueWithTask storageRef.downloadUrl
+        }?.addOnSuccessListener { uri ->
+            var contentDTO = ContentDTO()
+
+            //Insert downloadUrl of image
+            contentDTO.imageUrl = uri.toString()
+
+            //Insert uid of user
+            contentDTO.uid = auth?.currentUser?.uid
+
+            //Insert userId
+            contentDTO.userId = auth?.currentUser?.email
+
+            //Insert explain of content
+            contentDTO.explain = addphoto_edit_explain.text.toString()
+
+            //Insert timestamp
+            contentDTO.timestamp = System.currentTimeMillis()
+
+            firestore?.collection("images")?.document()?.set(contentDTO)
+
+            setResult(Activity.RESULT_OK)
+
+            finish()
         }
+
+
+//        //Callback method
+//        storageRef?.putFile(photoUri!!)?.addOnSuccessListener {
+//            storageRef.downloadUrl.addOnSuccessListener { uri->
+//                var contentDTO = ContentDTO()
+//
+//                //Insert downloadUrl of image
+//                contentDTO.imageUrl = uri.toString()
+//
+//                //Insert uid of user
+//                contentDTO.uid = auth?.currentUser?.uid
+//
+//                //Insert userId
+//                contentDTO.userId = auth?.currentUser?.email
+//
+//                //Insert explain of content
+//                contentDTO.explain = addphoto_edit_explain.text.toString()
+//
+//                //Insert timestamp
+//                contentDTO.timestamp = System.currentTimeMillis()
+//
+//                firestore?.collection("images")?.document()?.set(contentDTO)
+//
+//                setResult(Activity.RESULT_OK)
+//
+//                finish()
+//            }
+//        }
     }
 }
