@@ -22,6 +22,9 @@ class MainActivity : AppCompatActivity(),BottomNavigationView.OnNavigationItemSe
         bottom_navigation.selectedItemId=R.id.action_home
 
         ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),1)
+
+        //Set default screen
+        bottom_navigation.selectedItemId=R.id.action_home
     }
 
 
