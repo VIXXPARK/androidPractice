@@ -14,12 +14,15 @@ import com.example.burtbees.R
 import com.example.burtbees.navigation.model.ContentDTO
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.burtbees.MainActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class DetailViewFragment:Fragment(){
     var firestore : FirebaseFirestore? = null
+    var uid : String? = null
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         var view = LayoutInflater.from(activity).inflate(R.layout.fragment_detail,container,false)
         firestore = FirebaseFirestore.getInstance()
+        uid = FirebaseAuth.getInstance().currentUser?.uid
         view.findViewById<RecyclerView>(R.id.detailviewfragment_recycleview).adapter=DetailRecyclerViewAdapter()
         view.findViewById<RecyclerView>(R.id.detailviewfragment_recycleview).layoutManager=LinearLayoutManager(activity)
         return view
@@ -71,11 +74,44 @@ class DetailViewFragment:Fragment(){
             //ProfileImage
             Glide.with(holder.itemView.context).load(contentDTOs!![position].imageUrl).into(viewholder.findViewById(R.id.detailviewitem_profile_image))
 
+            //This code is when the button is clicked
+            viewholder.findViewById<ImageView>(R.id.detailviewitem_favorite_imageview).setOnClickListener{
+                favoriteEvent(position)
+            }
+
+            //This code is when the page is loaded
+            if(contentDTOs!![position].favorites.containsKey((uid))){
+                //This is like status
+                viewholder.findViewById<ImageView>(R.id.detailviewitem_favorite_imageview).setImageResource(R.drawable.ic_favorite)
+            }else{
+                //This is unlike status
+                viewholder.findViewById<ImageView>(R.id.detailviewitem_favorite_imageview).setImageResource(R.drawable.ic_favorite_border)
+            }
+
 
         }
 
         override fun getItemCount(): Int {
             return contentDTOs.size
+        }
+        fun favoriteEvent(position: Int){
+            var tsDoc = firestore?.collection("images")?.document(contentUidList[position])
+            firestore?.runTransaction{transaction->
+
+
+                var contentDTO = transaction.get(tsDoc!!).toObject(ContentDTO::class.java)
+
+                if(contentDTO!!.favorites.containsKey(uid)){
+                    //When the button is clicked
+                    contentDTO?.favoriteCount=contentDTO?.favoriteCount-1
+                    contentDTO?.favorites.remove(uid)
+                }else{
+                    //When the button is not clicked
+                    contentDTO?.favoriteCount=contentDTO?.favoriteCount+1
+                    contentDTO?.favorites[uid!!]=true
+                }
+                transaction.set(tsDoc,contentDTO)
+            }
         }
 
     }
