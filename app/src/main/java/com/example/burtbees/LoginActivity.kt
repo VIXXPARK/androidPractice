@@ -70,7 +70,13 @@ class LoginActivity : AppCompatActivity() {
         //printHashKey()
         callbackManager = CallbackManager.Factory.create()
     }
-    // /1hId+fdJaW2dBkfxIL4cDY95Vo=
+
+    override fun onStart(){
+        super.onStart()
+        moveMainPage(auth?.currentUser)
+    }
+
+
     fun printHashKey() {
         try {
             val info: PackageInfo = packageManager
@@ -139,7 +145,7 @@ class LoginActivity : AppCompatActivity() {
             if (result!!.isSuccess) {
                 var account = result.signInAccount
                 //Second step
-                firebaseAuthWithGoogle(account)
+                firebaseAuthWithGoogle(account!!)
             }
         }
 
@@ -196,6 +202,7 @@ class LoginActivity : AppCompatActivity() {
     fun moveMainPage(user: FirebaseUser?){
         if(user!=null){
             startActivity(Intent(this,MainActivity::class.java))
+            finish()
         }
 
     }

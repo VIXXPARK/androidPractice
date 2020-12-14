@@ -88,6 +88,15 @@ class DetailViewFragment:Fragment(){
                 viewholder.findViewById<ImageView>(R.id.detailviewitem_favorite_imageview).setImageResource(R.drawable.ic_favorite_border)
             }
 
+            //This code is when the profile image is clicked
+            viewholder.findViewById<ImageView>(R.id.detailviewitem_profile_image).setOnClickListener {
+                var fragment = UserFragment()
+                var bundle = Bundle()
+                bundle.putString("destinationUid",contentDTOs[position].uid)
+                bundle.putString("userId",contentDTOs[position].userId)
+                fragment.arguments=bundle
+                activity?.supportFragmentManager?.beginTransaction()?.replace(R.id.main_content,fragment)?.commit()
+            }
 
         }
 
