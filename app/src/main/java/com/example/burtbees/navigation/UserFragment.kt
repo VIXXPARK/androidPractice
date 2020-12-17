@@ -78,7 +78,7 @@ class UserFragment:Fragment(){
         fragmentView?.findViewById<ImageView>(R.id.account_iv_profile)?.setOnClickListener {
             var photoPickerIntent = Intent(Intent.ACTION_PICK)
             photoPickerIntent.type="image/*"
-            activity?.startActivityForResult(photoPickerIntent,PICK_PROFILE_FROM_ALBUM)
+            activity!!.startActivityForResult(photoPickerIntent,PICK_PROFILE_FROM_ALBUM)
         }
         getProfileImage()
         getFollowerAndFollowing()
@@ -166,7 +166,7 @@ class UserFragment:Fragment(){
             if(value == null) return@addSnapshotListener
             if(value.data!=null){
                 var url = value?.data!!["image"]
-                Glide.with(activity!!).load(url).apply(RequestOptions().circleCrop()).into(fragmentView?.findViewById(R.id.account_iv_profile)!!)
+                Glide.with(activity!!).load(url).apply(RequestOptions().circleCrop()).into(fragmentView!!.findViewById(R.id.account_iv_profile))
             }
         }
     }
