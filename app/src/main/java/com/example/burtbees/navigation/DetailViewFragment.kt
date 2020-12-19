@@ -15,6 +15,7 @@ import com.example.burtbees.R
 import com.example.burtbees.navigation.model.ContentDTO
 import com.google.firebase.firestore.FirebaseFirestore
 import com.example.burtbees.MainActivity
+import com.example.burtbees.navigation.model.AlarmDTO
 import com.google.firebase.auth.FirebaseAuth
 
 class DetailViewFragment:Fragment(){
@@ -101,6 +102,7 @@ class DetailViewFragment:Fragment(){
             viewholder.findViewById<ImageView>(R.id.detailviewitem_comment_imageview).setOnClickListener {v->
                 var intent = Intent(v.context,CommentActivity::class.java)
                 intent.putExtra("contentUid",contentUidList[position])
+                intent.putExtra("destinationUid",contentDTOs[position].uid)
                 startActivity(intent)
             }
 
@@ -124,9 +126,19 @@ class DetailViewFragment:Fragment(){
                     //When the button is not clicked
                     contentDTO?.favoriteCount=contentDTO?.favoriteCount+1
                     contentDTO?.favorites[uid!!]=true
+                    favoriteAlarm(contentDTOs[position].uid!!)
                 }
                 transaction.set(tsDoc,contentDTO)
             }
+        }
+        fun favoriteAlarm(destinationUid : String){
+            var alarmDTO = AlarmDTO()
+            alarmDTO.detinationUid = destinationUid
+            alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
+            alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid
+            alarmDTO.kind = 0
+            alarmDTO.timestamp = System.currentTimeMillis()
+            FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
         }
 
     }

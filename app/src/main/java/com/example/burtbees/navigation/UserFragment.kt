@@ -25,6 +25,7 @@ import com.bumptech.glide.request.RequestOptions
 import com.example.burtbees.LoginActivity
 import com.example.burtbees.MainActivity
 import com.example.burtbees.R
+import com.example.burtbees.navigation.model.AlarmDTO
 import com.example.burtbees.navigation.model.ContentDTO
 import com.example.burtbees.navigation.model.FollowDTO
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -142,7 +143,7 @@ class UserFragment:Fragment(){
                 followDTO= FollowDTO()
                 followDTO!!.followerCount =1
                 followDTO!!.follwers[currentUserUid!!]=true
-
+                followerAlarm(uid!!)
                 transaction.set(tsDocFollower,followDTO!!)
                 return@runTransaction
             }
@@ -155,10 +156,21 @@ class UserFragment:Fragment(){
                 //It add my follower when I follow a third person
                 followDTO!!.followerCount=followDTO!!.followerCount+1
                 followDTO!!.follwers[currentUserUid!!]=true
+                followerAlarm(uid!!)
             }
             transaction.set(tsDocFollower,followDTO!!)
             return@runTransaction
         }
+    }
+
+    fun followerAlarm(destinationUid : String){
+        var alarmDTO = AlarmDTO()
+        alarmDTO.detinationUid = destinationUid
+        alarmDTO.userId = auth?.currentUser?.email
+        alarmDTO.uid = auth?.currentUser?.uid
+        alarmDTO.kind=2
+        alarmDTO.timestamp=System.currentTimeMillis()
+        FirebaseFirestore.getInstance().collection("alarms").document().set(alarmDTO)
     }
 
     fun getProfileImage(){
