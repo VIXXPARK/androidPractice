@@ -33,6 +33,7 @@ class CommentActivity : AppCompatActivity() {
         contentUid = intent.getStringExtra("contentUid")
         destinationUid = intent.getStringExtra("destinationUid")
         comment_recylerview=findViewById(R.id.comment_recyclerview)
+
         comment_recylerview.adapter = CommentRecyclerviewAdapter()
         comment_recylerview.layoutManager=LinearLayoutManager(this)
 
@@ -52,6 +53,7 @@ class CommentActivity : AppCompatActivity() {
         var alarmDTO = AlarmDTO()
         alarmDTO.detinationUid = destinationUid
         alarmDTO.userId = FirebaseAuth.getInstance().currentUser?.email
+        alarmDTO.kind=1
         alarmDTO.uid = FirebaseAuth.getInstance().currentUser?.uid
         alarmDTO.timestamp = System.currentTimeMillis()
         alarmDTO.message = message
@@ -91,15 +93,20 @@ class CommentActivity : AppCompatActivity() {
             view.findViewById<TextView>(R.id.commentviewitem_textview_profile).text=comments[position].userId
 
             FirebaseFirestore.getInstance()
-                .collection("profileImages")
-                .document(comments[position].uid!!)
-                .get()
-                .addOnCompleteListener { task->
-                    if(task.isSuccessful){
-                        var url = task.result!!["images"]
-                        Glide.with(holder.itemView.context).load(url).apply(RequestOptions().circleCrop()).into(view.findViewById(R.id.commentviewitem_imageview_profile))
+                    .collection("profileImages")
+                    .document(comments[position].uid!!)
+                    .addSnapshotListener { documentSnapshot, firebaseFirestoreException ->
+                        if (documentSnapshot?.data != null) {
+
+                            val url = documentSnapshot?.data!!["image"]
+                            Glide.with(holder.itemView.context)
+                                    .load(url)
+                                    .apply(RequestOptions().circleCrop()).into(view.findViewById(R.id.commentviewitem_imageview_profile))
+                        }
                     }
-                }
+
+            view.findViewById<TextView>(R.id.commentviewitem_textview_profile).text = comments[position].userId
+            view.findViewById<TextView>(R.id.commentviewitem_textview_comment).text = comments[position].comment
         }
 
         override fun getItemCount(): Int {
